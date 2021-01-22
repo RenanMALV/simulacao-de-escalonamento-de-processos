@@ -7,7 +7,7 @@ const unsigned IO_DEVICE_NUMBER = CPU;
 
 typedef struct Process {
     unsigned start;
-    Queue instructions;
+    Queue* instructions;
     
     unsigned id, IOcounter;
 } Process;
