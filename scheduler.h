@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "process.h"
 #include "queue.h"
 
@@ -14,3 +15,10 @@ extern uint8_t timeUsed;
 extern Queue* IOqueues[];
 
 extern void scheduler();
+
+struct IODevice {
+  uint8_t duration;
+  uint8_t priority;
+};
+
+extern struct IODevice IOdevices[];
