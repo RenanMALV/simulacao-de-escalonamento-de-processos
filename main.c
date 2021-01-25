@@ -41,6 +41,17 @@ void process_add_instructions(Process* p, enum Instruction i, int amount){
     }
 }
 
+void simulateIO(){
+    for (int i = 0; i < IO_DEVICE_NUMBER; i++){
+        if (!queue_isempty(IOqueues[i])){
+            Process* p = process_table[queue_peek(IOqueues[i])];
+            if (--(p->IOcounter) == 0){
+                queue_push(ready_queues[IOdevices[i].priority], p->id);
+            }
+        }
+    }
+}
+
 
 int main(void){
     
@@ -52,7 +63,9 @@ int main(void){
         IOqueues[i] = queue_create(NUM_PROCESSES);
         
     future_processes[0].instructions = queue_create(20);
-    process_add_instructions(&future_processes[0], CPU, 5);
+    process_add_instructions(&future_processes[0], CPU, 3);
+    process_add_instructions(&future_processes[0], DISK, 1);
+    process_add_instructions(&future_processes[0], CPU, 2);
     future_processes[1].instructions = queue_create(20);
     process_add_instructions(&future_processes[1], CPU, 5);
 
@@ -66,6 +79,7 @@ int main(void){
             timeUsed++;
         }
         CPUtime++;
-        // printf("Test");
+        
+        simulateIO();
     }
 }
