@@ -7,6 +7,12 @@ uint8_t timeUsed = 0;
 
 Queue* IOqueues[IO_DEVICE_NUMBER];
 
+struct IODevice IOdevices[IO_DEVICE_NUMBER] = {
+    {4, 0},
+    {7, 0},
+    {20, 0}
+};
+
 void get_next_process(){
     for (int i = 0; i < NUM_PRIORITIES; i++) {
         if (!queue_isempty(ready_queues[i])) {
@@ -36,7 +42,7 @@ void scheduler(){
     int instruction;
     while (currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
         queue_push(IOqueues[instruction], currentProcess->id);
-        currentProcess->IOcounter = 7;
+        currentProcess->IOcounter = IOdevices[instruction].duration;
         get_next_process();
     }
 }
