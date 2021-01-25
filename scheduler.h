@@ -4,21 +4,40 @@
 #include "process.h"
 #include "queue.h"
 
+// Número de filas de prioridade. Menor prioridade = mais prioritário.
 #define NUM_PRIORITIES 2
+
+// Quantum máximo para um processo no Round Robin.
 #define MAX_TIME_USED 3
 
+
+// Global que guarda um ponteiro para o processo a ser executado pela CPU.
 extern Process* currentProcess;
+
+// Array global que guarda as filas de processos prontos para cada nível de prioridade.
 extern Queue* ready_queues[];
 
+// Global que guarda o tempo consumido pelo "currentProcess".
 extern uint8_t timeUsed;
 
-extern Queue* IOqueues[];
+/*
+ Esta é a função principal desse arquivo. Seu objetivo é simular a ação do escalondor,
+e ela deve ser chamada antes da simulação da CPU (ou seja, antes do incremento de CPUtime).
 
+ Ela irá setar o valor da global "currentProcess" para o próximo processo que será executado
+pela CPU. Ela também é responsável por lidar com processos que pedem acesso a um dispositivo
+de E/S.
+*/
 extern void scheduler();
 
+// Struct que representa um dispositivo de E/S e suas propriedades.
 struct IODevice {
-  uint8_t duration;
-  uint8_t priority;
+  uint8_t duration;  // duração da operação de E/S para esse dispositivo.
+  uint8_t priority;  // prioridade com a qual um processo retorna à fila de prontos.
 };
 
+// Array que guarda o respectivo IODevice para cada dispositivo (exemplo de uso: IOdevices[DISK].duration)
 extern struct IODevice IOdevices[];
+
+// Array que guarda as filas para cada dispositivo de E/S.
+extern Queue* IOqueues[];
