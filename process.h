@@ -1,9 +1,13 @@
 #pragma once
 
+#include <stdint.h>
 #include "queue.h"
 
+#define NUM_PROCESSES 20
+#define IO_DEVICE_NUMBER 3
+
 enum Instruction {DISK, TAPE, PRINTER, CPU};
-const unsigned IO_DEVICE_NUMBER = CPU;
+
 
 typedef struct Process {
     unsigned start;
@@ -11,3 +15,5 @@ typedef struct Process {
     
     unsigned id, IOcounter;
 } Process;
+
+extern Process* process_table[];
