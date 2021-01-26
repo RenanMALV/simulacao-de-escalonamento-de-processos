@@ -2,7 +2,7 @@
 #include "queue.h"
 
 // Array que guarda as filas de processos para cada dispositivo de E/S.
-Queue* IOqueues[IO_DEVICE_NUMBER];
+static Queue* IOqueues[IO_DEVICE_NUMBER];
 
 struct IODevice IOdevices[IO_DEVICE_NUMBER] = {
     {.duration=4,  .priority=1 },  // Disk
