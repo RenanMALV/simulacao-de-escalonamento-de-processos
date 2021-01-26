@@ -12,18 +12,12 @@ unsigned CPUtime = 0;
 // Função usada para simular a chegada de novos processos.
 void create_processes();
 
-// Simula o funcionamento dos dispositivos de E/S.
-void simulateIO();
-
-// Função que inicializa o sistema
-void initialize();
+void initialize_processes();
 
 void simulateCPU(){
     int instruction;
     while (currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
-        currentProcess->priority = IOdevices[instruction].priority;
-        request_device(instruction, currentProcess->id);
-        scheduler_block();
+        request_device(instruction);
     }
     
     if (currentProcess) printf("%d : %d\n", CPUtime, currentProcess->id);
@@ -46,12 +40,14 @@ elas são definidas.
 int main(void){
     
     // Inicializar o sistema.
-    initialize();
+    devices_init();
+    scheduler_init();
+    initialize_processes();
 
     // Simular o loop de funcionamento do sistema:
     while (CPUtime < 100){
         // Passo 1: Simular a chegada de novos processos.
-        create_processes(); // // (implementação: ???.c (está implementado neste arquvio por enquanto))
+        create_processes(); // (implementação: ???.c (está implementado neste arquvio por enquanto))
         
         // Passo 2: Simular a execução do escalonador.
         scheduler();  // (implementação: scheduler.c)
@@ -101,16 +97,6 @@ void create_processes(){
     }
 }
 
-void simulateIO(){
-    for (int i = 0; i < IO_DEVICE_NUMBER; i++){
-        int pid = simulate_device(i);
-        
-        if (pid){
-            schedule_process(process_table[pid]);
-        }
-    }
-}
-
 void initialize_processes(){
     future_processes[0].instructions = queue_create(20);
     process_add_instructions(&future_processes[0], CPU, 3);
@@ -124,13 +110,4 @@ void initialize_processes(){
     process_add_instructions(&future_processes[2], CPU, 1);
     process_add_instructions(&future_processes[2], TAPE, 1);
     process_add_instructions(&future_processes[2], CPU, 4);  
-}
-
-void initialize(){
-
-    devices_init();
-    scheduler_init();
-    
-    initialize_processes();
-
 }
