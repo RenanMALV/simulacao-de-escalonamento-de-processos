@@ -21,6 +21,7 @@ void initialize();
 void simulateCPU(){
     int instruction;
     while (currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
+        currentProcess->priority = IOdevices[instruction].priority;
         request_device(instruction, currentProcess->id);
         scheduler_block();
     }
@@ -65,12 +66,15 @@ int main(void){
 
 //------------------------------------------------------------------------------
 // Process reation
-#define TOTAL_PROCESSES  2
+#define TOTAL_PROCESSES  3
+#define INITIAL_PRIORITY 0
+
 uint8_t pid_gen = 0;
 int future_index = 0;
 
 Process future_processes[TOTAL_PROCESSES] = {
     {.start=0},
+    {.start=5},
     {.start=5}
 };
 
@@ -80,13 +84,16 @@ void create_processes(){
         Process* p = &future_processes[future_index];
         if (CPUtime == p->start){
             pid_gen++;
+            future_index++;
+            
+            // Inicializar processo
             p->id = pid_gen;
             p->state = PSTATE_CREATED;
-            queue_push(ready_queues[0], pid_gen);
-            p->state = PSTATE_READY;
-            process_table[pid_gen] = p;
-            future_index++;
+            p->priority = INITIAL_PRIORITY;
+            process_table[p->id] = p;
             printf("New process: %d\n", p->id);
+            
+            schedule_process(p);
         }
         else{
             return;
@@ -99,23 +106,31 @@ void simulateIO(){
         int pid = simulate_device(i);
         
         if (pid){
-            queue_push(ready_queues[IOdevices[i].priority], pid);
+            schedule_process(process_table[pid]);
         }
     }
 }
 
-void initialize(){
-    for (int i = 0; i < NUM_PRIORITIES; i++)
-        ready_queues[i] = queue_create(NUM_PROCESSES);
-        
-    
-    devices_init();
-        
+void initialize_processes(){
     future_processes[0].instructions = queue_create(20);
     process_add_instructions(&future_processes[0], CPU, 3);
     process_add_instructions(&future_processes[0], DISK, 1);
-    process_add_instructions(&future_processes[0], CPU, 2);
+    process_add_instructions(&future_processes[0], CPU, 10);
+    
     future_processes[1].instructions = queue_create(20);
     process_add_instructions(&future_processes[1], CPU, 5);
+    
+    future_processes[2].instructions = queue_create(20);
+    process_add_instructions(&future_processes[2], CPU, 1);
+    process_add_instructions(&future_processes[2], TAPE, 1);
+    process_add_instructions(&future_processes[2], CPU, 4);  
+}
+
+void initialize(){
+
+    devices_init();
+    scheduler_init();
+    
+    initialize_processes();
 
 }
