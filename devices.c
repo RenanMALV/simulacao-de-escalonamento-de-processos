@@ -1,41 +1,64 @@
 #include "devices.h"
 #include "queue.h"
+#include "scheduler.h"
 
-// Array que guarda as filas de processos para cada dispositivo de E/S.
-static Queue* IOqueues[IO_DEVICE_NUMBER];
+// Struct que representa um dispositivo de E/S e suas propriedades.
+struct IODevice {
+  const uint8_t duration;  // duração da operação de E/S para esse dispositivo.
+  const uint8_t priority;  // prioridade com a qual um processo retorna à fila de prontos
+  uint8_t counter;
+  Queue* queue;            // fila de processos que pediram uma operação no dispositivo.
+};
 
-struct IODevice IOdevices[IO_DEVICE_NUMBER] = {
+// Array que guarda as structs que representam cada dispositivo.
+static struct IODevice IOdevices[IO_DEVICE_NUMBER] = {
     {.duration=4,  .priority=1 },  // Disk
     {.duration=7,  .priority=0 },  // Tape
     {.duration=20, .priority=0 }   // Printer
 };
 
-int device_isactive(int deviceid){
-    return !queue_isempty(IOqueues[deviceid]);
-}
-
-void request_device(int deviceid, int pid){
-    queue_push(IOqueues[deviceid], pid);
-}
-
-
-int simulate_device(int i){
+// Simula a operação de um dispositivo. Quando uma operação é completada, retorna o pid do processo. Senão retorna zero.
+static int simulate_device(int i){
     struct IODevice* device = &IOdevices[i];
     
     if (device_isactive(i)){
         if (--(device->counter) == 0){
             device->counter = device->duration;
-            return queue_pop(IOqueues[i]);
+            return queue_pop(IOdevices[i].queue);
         }
     }
     
     return 0;
 }
 
-void devices_init(){
+// -----
+
+extern int device_isactive(int deviceid){
+    return !queue_isempty(IOdevices[deviceid].queue);
+}
+
+extern void request_device(int deviceid){
+    struct IODevice* device = &IOdevices[deviceid];
+    
+    queue_push(device->queue, currentProcess->id);
+    
+    currentProcess->priority = device->priority;
+    scheduler_block();
+}
+
+extern void simulateIO(){
     for (int i = 0; i < IO_DEVICE_NUMBER; i++){
-        IOqueues[i] = queue_create(NUM_PROCESSES);
+        int pid = simulate_device(i);
+        
+        if (pid){
+            schedule_process(process_table[pid]);
+        }
+    }
+}
+
+extern void devices_init(){
+    for (int i = 0; i < IO_DEVICE_NUMBER; i++){
+        IOdevices[i].queue = queue_create(NUM_PROCESSES);
         IOdevices[i].counter = IOdevices[i].duration;
     }
-        
 }
