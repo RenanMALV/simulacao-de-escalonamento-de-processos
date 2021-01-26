@@ -4,6 +4,7 @@
 #include "process.h"
 #include "queue.h"
 #include "scheduler.h"
+#include "devices.h"
 
 #define TOTAL_PROCESSES  2
 
