@@ -1,9 +1,9 @@
 #include "scheduler.h"
-#include "devices.h"
 
 Process* currentProcess = NULL;
-Queue* ready_queues[NUM_PRIORITIES];
 uint8_t timeUsed = 0;
+
+static Queue* ready_queues[NUM_PRIORITIES];
 
 /*
  Esta função irá atribuir à global "currentProcess" o ponteiro do próximo processo
@@ -21,6 +21,11 @@ static void get_next_process(){
     currentProcess = NULL;
 }
 
+void schedule_process(Process* p){
+    p->state = PSTATE_READY;
+    queue_push(ready_queues[p->priority], p->id);
+}
+
 void scheduler_block(){
     currentProcess->state = PSTATE_BLOCKED;
     get_next_process();
@@ -36,9 +41,14 @@ void scheduler(){
             get_next_process();
         }
         else if (timeUsed >= MAX_TIME_USED){
-            queue_push(ready_queues[1], currentProcess->id);
-            currentProcess->state = PSTATE_READY;
+            currentProcess->priority = 1;
+            schedule_process(currentProcess);
             get_next_process();
         }
     }
+}
+
+void scheduler_init(){
+    for (int i = 0; i < NUM_PRIORITIES; i++)
+        ready_queues[i] = queue_create(NUM_PROCESSES);
 }
