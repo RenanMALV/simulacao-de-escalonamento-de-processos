@@ -29,3 +29,5 @@ pela CPU. Ela também é responsável por lidar com processos que pedem acesso a
 de E/S.
 */
 extern void scheduler();
+
+void scheduler_block();
