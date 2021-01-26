@@ -49,7 +49,7 @@ int main(void){
         CPUtime++;
 
         // Passo 4: Simular o processamento nos dispositivos de E/S.
-        simulateIO(); // (implementação: iodevices.c (ainda não criado, está implementado em scheduler.c e neste arquvio))
+        simulateIO(); // (implementação: devices.c)
         
         // Mostrar tempo da CPU e o processo atual no console.
         if (currentProcess) printf("%d : %d\n", CPUtime, currentProcess->id);
@@ -86,11 +86,10 @@ void create_processes(){
 
 void simulateIO(){
     for (int i = 0; i < IO_DEVICE_NUMBER; i++){
-        if (!queue_isempty(IOqueues[i])){
-            Process* p = process_table[queue_peek(IOqueues[i])];
-            if (--(p->IOcounter) == 0){
-                queue_push(ready_queues[IOdevices[i].priority], p->id);
-            }
+        int pid = simulate_device(i);
+        
+        if (pid){
+            queue_push(ready_queues[IOdevices[i].priority], pid);
         }
     }
 }
@@ -100,8 +99,7 @@ void initialize(){
         ready_queues[i] = queue_create(NUM_PROCESSES);
         
     
-    for (int i = 0; i < IO_DEVICE_NUMBER; i++)
-        IOqueues[i] = queue_create(NUM_PROCESSES);
+    devices_init();
         
     future_processes[0].instructions = queue_create(20);
     process_add_instructions(&future_processes[0], CPU, 3);
