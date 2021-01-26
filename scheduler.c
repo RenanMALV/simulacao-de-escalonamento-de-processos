@@ -9,7 +9,7 @@ uint8_t timeUsed = 0;
  Esta função irá atribuir à global "currentProcess" o ponteiro do próximo processo
 a ser executado, de acordo com a ordem das filas de prioridade.
 */
-void get_next_process(){
+static void get_next_process(){
     for (int i = 0; i < NUM_PRIORITIES; i++) {
         if (!queue_isempty(ready_queues[i])) {
             currentProcess = process_table[queue_pop(ready_queues[i])];
@@ -37,8 +37,7 @@ void scheduler(){
     
     int instruction;
     while (currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
-        queue_push(IOqueues[instruction], currentProcess->id);
-        currentProcess->IOcounter = IOdevices[instruction].duration;
+        request_device(instruction, currentProcess->id);
         get_next_process();
     }
     
