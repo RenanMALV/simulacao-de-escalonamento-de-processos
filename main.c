@@ -6,8 +6,6 @@
 #include "scheduler.h"
 #include "devices.h"
 
-#define TOTAL_PROCESSES  2
-
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
 
@@ -19,6 +17,18 @@ void simulateIO();
 
 // Função que inicializa o sistema
 void initialize();
+
+void simulateCPU(){
+    int instruction;
+    while (currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
+        request_device(instruction, currentProcess->id);
+        scheduler_block();
+    }
+    
+    if (currentProcess) printf("%d : %d\n", CPUtime, currentProcess->id);
+    CPUtime++;
+    timeUsed++;
+}
 
 //------------------------------------------------------------------------------
 //                         S I M U L A D O R
@@ -46,18 +56,16 @@ int main(void){
         scheduler();  // (implementação: scheduler.c)
         
         // Passo 3: Simular o processamento na CPU.
-        CPUtime++;
+        simulateCPU();
 
         // Passo 4: Simular o processamento nos dispositivos de E/S.
         simulateIO(); // (implementação: devices.c)
-        
-        // Mostrar tempo da CPU e o processo atual no console.
-        if (currentProcess) printf("%d : %d\n", CPUtime, currentProcess->id);
     }
 }
 
 //------------------------------------------------------------------------------
-// Process creation
+// Process reation
+#define TOTAL_PROCESSES  2
 uint8_t pid_gen = 0;
 int future_index = 0;
 
@@ -73,7 +81,9 @@ void create_processes(){
         if (CPUtime == p->start){
             pid_gen++;
             p->id = pid_gen;
+            p->state = PSTATE_CREATED;
             queue_push(ready_queues[0], pid_gen);
+            p->state = PSTATE_READY;
             process_table[pid_gen] = p;
             future_index++;
             printf("New process: %d\n", p->id);
