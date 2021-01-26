@@ -14,9 +14,6 @@
 // Global que guarda um ponteiro para o processo a ser executado pela CPU.
 extern Process* currentProcess;
 
-// Array global que guarda as filas de processos prontos para cada nível de prioridade.
-extern Queue* ready_queues[];
-
 // Global que guarda o tempo consumido pelo "currentProcess".
 extern uint8_t timeUsed;
 
@@ -30,4 +27,11 @@ de E/S.
 */
 extern void scheduler();
 
+// Bloqueia o currentProcess.
 void scheduler_block();
+
+// Coloca um processo na fila de processos prontos respectiva à sua prioridade.
+void schedule_process(Process* p);
+
+// Inicializa o escalonador. Deve ser chamada antes do laço principal do simulador.
+void scheduler_init();
