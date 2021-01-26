@@ -8,13 +8,14 @@
 #define IO_DEVICE_NUMBER 3
 
 enum Instruction {DISK, TAPE, PRINTER, CPU};
-
+enum ProcessState {PSTATE_INVALID, PSTATE_CREATED, PSTATE_READY, PSTATE_RUNNING, PSTATE_BLOCKED, PSTATE_TERMINATED};
 
 typedef struct Process {
     unsigned start;
     Queue* instructions;
     
     unsigned id;  // Número de identificação do processo.
+    enum ProcessState state;
 } Process;
 
 // Tabela de processos (contém todos os processos vivos no sistema).
