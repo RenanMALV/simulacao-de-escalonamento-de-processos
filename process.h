@@ -16,6 +16,7 @@ typedef struct Process {
     
     unsigned id;  // Número de identificação do processo.
     enum ProcessState state;
+    unsigned priority;
 } Process;
 
 // Tabela de processos (contém todos os processos vivos no sistema).
