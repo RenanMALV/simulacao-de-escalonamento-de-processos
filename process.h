@@ -15,7 +15,6 @@ typedef struct Process {
     Queue* instructions;
     
     unsigned id;  // Número de identificação do processo.
-    unsigned IOcounter;
 } Process;
 
 // Tabela de processos (contém todos os processos vivos no sistema).
