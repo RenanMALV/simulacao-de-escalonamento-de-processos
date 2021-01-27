@@ -5,14 +5,10 @@
 #include "queue.h"
 #include "scheduler.h"
 #include "devices.h"
+#include "creator.h"
 
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
-
-// Função usada para simular a chegada de novos processos.
-void create_processes();
-
-void initialize_processes();
 
 void simulateCPU(){
     int instruction;
@@ -47,7 +43,7 @@ int main(void){
     // Simular o loop de funcionamento do sistema:
     while (CPUtime < 100){
         // Passo 1: Simular a chegada de novos processos.
-        create_processes(); // (implementação: ???.c (está implementado neste arquvio por enquanto))
+        create_processes(); // (implementação: creator.c)
         
         // Passo 2: Simular a execução do escalonador.
         scheduler();  // (implementação: scheduler.c)
@@ -61,53 +57,3 @@ int main(void){
 }
 
 //------------------------------------------------------------------------------
-// Process reation
-#define TOTAL_PROCESSES  3
-#define INITIAL_PRIORITY 0
-
-uint8_t pid_gen = 0;
-int future_index = 0;
-
-Process future_processes[TOTAL_PROCESSES] = {
-    {.start=0},
-    {.start=5},
-    {.start=5}
-};
-
-
-void create_processes(){
-    while (future_index < TOTAL_PROCESSES){
-        Process* p = &future_processes[future_index];
-        if (CPUtime == p->start){
-            pid_gen++;
-            future_index++;
-            
-            // Inicializar processo
-            p->id = pid_gen;
-            p->state = PSTATE_CREATED;
-            p->priority = INITIAL_PRIORITY;
-            process_table[p->id] = p;
-            printf("New process: %d\n", p->id);
-            
-            schedule_process(p);
-        }
-        else{
-            return;
-        }   
-    }
-}
-
-void initialize_processes(){
-    future_processes[0].instructions = queue_create(20);
-    process_add_instructions(&future_processes[0], CPU, 3);
-    process_add_instructions(&future_processes[0], DISK, 1);
-    process_add_instructions(&future_processes[0], CPU, 10);
-    
-    future_processes[1].instructions = queue_create(20);
-    process_add_instructions(&future_processes[1], CPU, 5);
-    
-    future_processes[2].instructions = queue_create(20);
-    process_add_instructions(&future_processes[2], CPU, 1);
-    process_add_instructions(&future_processes[2], TAPE, 1);
-    process_add_instructions(&future_processes[2], CPU, 4);  
-}
