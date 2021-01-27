@@ -41,7 +41,7 @@ int main(void){
     initialize_processes();
 
     // Simular o loop de funcionamento do sistema:
-    while (CPUtime < 100){
+    while (process_count > 0 || has_incoming_processes()){
         // Passo 1: Simular a chegada de novos processos.
         create_processes(); // (implementação: creator.c)
         
