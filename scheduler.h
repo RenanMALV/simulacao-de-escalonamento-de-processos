@@ -27,10 +27,10 @@ de E/S.
 */
 extern void scheduler();
 
-// Bloqueia o currentProcess.
+// Bloqueia o currentProcess e atribui a essa variável o próximo processo.
 void scheduler_block();
 
-// Coloca um processo na fila de processos prontos respectiva à sua prioridade.
+// Coloca um processo na fila de processos prontos referente à sua prioridade.
 void schedule_process(Process* p);
 
 // Inicializa o escalonador. Deve ser chamada antes do laço principal do simulador.
