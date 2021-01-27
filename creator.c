@@ -36,7 +36,7 @@ extern void create_processes(){
             p->state = PSTATE_CREATED;
             p->priority = INITIAL_PRIORITY;
             process_table[p->id] = p;
-            output_info( CPUtime ,p->state, p->id);
+            output_info(p);
             process_count++;
             
             schedule_process(p);
