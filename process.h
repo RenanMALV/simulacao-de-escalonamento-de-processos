@@ -23,5 +23,7 @@ typedef struct Process {
 // Mapeia um id de processo para o ponteiro daquele processo.
 extern Process* process_table[];
 
+unsigned process_count;
+
 // Adiciona "amount" instruções do tipo "i" na fila do processo "p".
 void process_add_instructions(Process* p, enum Instruction i, int amount);
