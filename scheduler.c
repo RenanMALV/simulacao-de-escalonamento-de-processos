@@ -1,8 +1,5 @@
 #include "scheduler.h"
 
-Process* currentProcess = NULL;
-uint8_t timeUsed = 0;
-
 static Queue* ready_queues[NUM_PRIORITIES];
 
 /*
@@ -21,17 +18,22 @@ static void get_next_process(){
     currentProcess = NULL;
 }
 
-void schedule_process(Process* p){
+// -----
+
+extern Process* currentProcess = NULL;
+extern uint8_t timeUsed = 0;
+
+extern void schedule_process(Process* p){
     p->state = PSTATE_READY;
     queue_push(ready_queues[p->priority], p->id);
 }
 
-void scheduler_block(){
+extern void scheduler_block(){
     currentProcess->state = PSTATE_BLOCKED;
     get_next_process();
 }
 
-void scheduler(){
+extern void scheduler(){
     if (!currentProcess){
         get_next_process();
     }
@@ -48,7 +50,7 @@ void scheduler(){
     }
 }
 
-void scheduler_init(){
+extern void scheduler_init(){
     for (int i = 0; i < NUM_PRIORITIES; i++)
         ready_queues[i] = queue_create(NUM_PROCESSES);
 }
