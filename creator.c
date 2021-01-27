@@ -18,6 +18,10 @@ static Process future_processes[TOTAL_PROCESSES] = {
 
 // -----
 
+extern int has_incoming_processes(){
+    return future_index < TOTAL_PROCESSES;
+}
+
 extern void create_processes(){
     static uint8_t pid_gen = 0;
     
@@ -33,6 +37,7 @@ extern void create_processes(){
             p->priority = INITIAL_PRIORITY;
             process_table[p->id] = p;
             printf("New process: %d\n", p->id);
+            process_count++;
             
             schedule_process(p);
         }
