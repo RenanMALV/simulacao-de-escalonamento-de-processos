@@ -18,6 +18,15 @@ extern Process* currentProcess;
 // Global que guarda o tempo consumido pelo "currentProcess".
 extern uint8_t timeUsed;
 
+// Inicializa o escalonador. Deve ser chamada antes do laço principal do simulador.
+void scheduler_init();
+
+// Bloqueia o currentProcess e atribui a essa variável o próximo processo.
+void scheduler_block();
+
+// Coloca um processo na fila de processos prontos referente à sua prioridade.
+void schedule_process(Process* p);
+
 /*
  Esta é a função principal desse arquivo. Seu objetivo é simular a ação do escalondor,
 e ela deve ser chamada antes da simulação da CPU (ou seja, antes do incremento de CPUtime).
@@ -26,16 +35,14 @@ e ela deve ser chamada antes da simulação da CPU (ou seja, antes do incremento
 pela CPU. Ela também é responsável por lidar com processos que pedem acesso a um dispositivo
 de E/S.
 */
-extern void scheduler();
+void scheduler();
 
-// Bloqueia o currentProcess e atribui a essa variável o próximo processo.
-void scheduler_block();
+// -----
+// As funções abaixo permitem explorar as filas de processos prontos.
+// Elas não são utilizadas pelo simulador em si, são chamadas apenas para gerar a saída do programa no console.
 
-// Coloca um processo na fila de processos prontos referente à sua prioridade.
-void schedule_process(Process* p);
+// Tamanho da file de processos prontos para a dada prioridade.
+unsigned scheduler_qlength(int priority);
 
-// Inicializa o escalonador. Deve ser chamada antes do laço principal do simulador.
-void scheduler_init();
-
-// informa o estado atual das filas do sistema, além de identificar novos processos
-extern void output_info( unsigned Tick, int pState, int PID);
+// Wrapper de queue_foreach para a fila de processos prontos para a dada prioridade.
+void scheduler_qforeach(int priority, void (*fun)(int));
