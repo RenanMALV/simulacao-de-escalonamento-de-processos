@@ -13,22 +13,22 @@
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
 
-
+char* device_names[3] = {"DISK", "TAPE", "PRINTER"};
 
 void simulateCPU(){
     int instruction;
     while(currentProcess && (instruction = queue_pop(currentProcess->instructions)) != CPU){
+        printf("[Tick %d]\tCPU: REQUEST %s (pid %d)\n", CPUtime, device_names[instruction], currentProcess->id);
         request_device(instruction);
     }
-    if (currentProcess)
-      output_info(CPUtime, currentProcess->state, currentProcess->id);
-    else
-      output_info(CPUtime, PSTATE_INVALID, 0);
+    
+    timeUsed++;
+    output_info(currentProcess);
     
     sleep(1);
     
     CPUtime++;
-    timeUsed++;
+    
 }
 
 //------------------------------------------------------------------------------
@@ -67,3 +67,52 @@ int main(void){
 }
 
 //------------------------------------------------------------------------------
+// Código usado para gerar a saída do programar e mostar informações da simulação.
+
+static char instruction_chars[4] = {'D', 'T', 'P', 'C'};
+static char* priority_names[2] = {"HIGH", "LOW"};
+
+static void print_int(int pid){
+    printf("%d ", pid);
+}
+
+static void print_instruction(int i){
+    printf("%c", instruction_chars[i]);
+}
+
+static void print_queues(){
+    for (int i =0; i < NUM_PRIORITIES; i++){
+        if (scheduler_qlength(i) > 0){
+           printf("[Tick %d]\tReady Queue (%s): { ", CPUtime, priority_names[i]);
+            scheduler_qforeach(i, *print_int);
+            printf("}\n"); 
+        }
+    }
+    printf("\n");
+}
+
+// -----
+
+extern void output_info(Process* p){
+    //printf("[Tick %d]\tQueues: | Ready [%d] [%d] |", Tick, scheduler_qlength(0), scheduler_qlength(1));
+    printf("[Tick %d]\t", CPUtime);
+
+    if (p){
+        if (p->state == PSTATE_CREATED){
+            printf("New process: pid %d (", p->id);
+            queue_foreach(p->instructions, &print_instruction);
+            printf(")\n");
+        }
+        else{
+            printf("CPU: RUNNING (pid %d) - t=%d\n", p->id, timeUsed);
+            print_queues();
+        }
+            
+    }
+    else{
+        printf("CPU: IDLE - t=%d\n", timeUsed);
+        print_queues();
+    }
+        
+
+}
