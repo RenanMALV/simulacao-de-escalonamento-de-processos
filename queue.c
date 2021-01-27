@@ -3,7 +3,7 @@
 */
 #include "queue.h"
 
-// Cria uma fila com uma certa capacidade.
+
 Queue* queue_create(unsigned maxlength) { 
     Queue* queue = (Queue*) malloc(sizeof(Queue));
     
@@ -15,22 +15,49 @@ Queue* queue_create(unsigned maxlength) {
     return queue;
 } 
 
-// Fila está cheia?
+Queue* queue_copy(Queue* original) { 
+    Queue* queue = (Queue*) malloc(sizeof(Queue));
+    
+    queue->first = original->first;
+    queue->length = original->length;
+    queue->last = original->last;
+    queue->maxlength = original->maxlength;
+    
+    queue->array = (TYPE*) malloc(queue->maxlength * sizeof(TYPE));
+    
+    
+    if (queue->length > 0){
+        if (queue->first > queue->last){
+            for (int i=queue->first; i < queue->maxlength; i++)
+                    queue->array[i] = original->array[i];
+                    
+            for (int i=0; i <= queue->last; i++)
+                    queue->array[i] = original->array[i];
+        } else{
+            for (int i=queue->first; i <= queue->last; i++)
+                    queue->array[i] = original->array[i];
+        }
+    }
+    
+    return queue;
+}
+
 int queue_isfull(Queue* queue) {
     return (queue->length == queue->maxlength);
 }
 
-// Fila está vazia?
 int queue_isempty(Queue* queue) {
     return !(queue->length);
 }
 
-// Retorna o primeiro elemento da fila.
 TYPE queue_peek(Queue* queue) {
     return queue->array[queue->first];
 }
 
-// Coloca um elemento no final da fila.
+TYPE queue_peekn(Queue* queue, unsigned n) {
+    return queue->array[(n + queue->first) % queue->maxlength];
+}
+
 void queue_push(Queue* queue, TYPE item) {
     if (!queue_isfull(queue)) {
         queue->last = (queue->last + 1) % queue->maxlength;
@@ -45,4 +72,19 @@ TYPE queue_pop(Queue* queue) {
     queue->first = (queue->first + 1) % queue->maxlength;
     queue->length--; 
     return item;
+}
+
+void queue_foreach(Queue* queue, void (*fun)(TYPE)) {
+    if (queue->length > 0){
+        if (queue->first > queue->last){
+            for (int i=queue->first; i < queue->maxlength; i++)
+                    (*fun)(queue->array[i]);
+                    
+            for (int i=0; i <= queue->last; i++)
+                    (*fun)(queue->array[i]);
+        } else{
+            for (int i=queue->first; i <= queue->last; i++)
+                    (*fun)(queue->array[i]);
+        }
+    }
 }
