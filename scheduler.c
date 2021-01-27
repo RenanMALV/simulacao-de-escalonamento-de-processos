@@ -62,13 +62,10 @@ extern void scheduler_init(){
         ready_queues[i] = queue_create(NUM_PROCESSES);
 }
 
-extern void output_info( unsigned Tick, int pState, int PID){
-  printf("[Tick %d]\tQueues: | Ready [%d] [%d] |", Tick, ready_queues[0]->length, ready_queues[1]->length);
+unsigned scheduler_qlength(int priority){
+    return ready_queues[priority]->length;
+}
 
-  if(pState == PSTATE_CREATED)
-    printf("\tNew process id %d\n", PID);
-  else if(pState != PSTATE_INVALID)
-    printf("\tExecution process id %d\n", PID);
-  else 
-    printf("\tNone - CPU IDLE\n");
+void scheduler_qforeach(int priority, void (*fun)(int)){
+    queue_foreach(ready_queues[priority], fun);
 }
