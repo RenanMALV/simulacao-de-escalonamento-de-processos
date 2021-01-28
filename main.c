@@ -11,12 +11,6 @@
 #include "creator.h"
 #include "output.h"
 
-#ifdef EXAMPLE
-    #define example if (1)
-#else
-    #define example if (0)
-#endif
-
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
 
