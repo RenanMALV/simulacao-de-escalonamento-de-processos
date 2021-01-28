@@ -21,3 +21,10 @@ operação for completada, o processo será desbloqueado e colocada na respectiv
 de prioridade pelo escalonador.
 */
 void simulateIO();
+
+// -----
+// As funções abaixo permitem explorar as filas de processos esperando operações de E/S.
+// Elas não são utilizadas pelo simulador em si, são chamadas apenas para gerar a saída do programa no console.
+
+// Wrapper de queue_foreach para a fila de processos prontos para o IOdevice.
+void device_qforeach(int deviceid, void (*fun)(TYPE));
