@@ -5,7 +5,7 @@
 #include "output.h"
 
 #define TOTAL_PROCESSES  3  // Total de processos pré-definidos criados.
-#define INITIAL_PRIORITY 0  // Prioridade atribuída a processos recém-criados.
+
 
 // Indica qual será o índice da próxima operação da CPU
 static int future_index = 0;
@@ -15,7 +15,6 @@ static Process future_processes[TOTAL_PROCESSES] = {
     {.start=5},
     {.start=5}
 };
-
 
 // -----
 
