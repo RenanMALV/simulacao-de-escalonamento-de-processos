@@ -9,6 +9,7 @@
 #include "scheduler.h"
 #include "devices.h"
 #include "creator.h"
+#include "output.h"
 
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
@@ -73,6 +74,7 @@ static char instruction_chars[4] = {'D', 'T', 'P', 'C'};
 static char* priority_names[2] = {"HIGH", "LOW"};
 
 #define SHOW_EMPTY_QUEUES 1
+#define SHOW_EVENTS 1
 
 static void print_int(TYPE pid){
     printf("%d ", pid);
@@ -104,6 +106,21 @@ static void print_queues(){
 }
 
 // -----
+
+extern void output_event_preempt(Process* p){
+    if (SHOW_EVENTS)
+        printf("[Tick %d]\tSCHEDULER: PREEMPT (pid %d)\n", CPUtime, p->id);
+}
+
+extern void output_event_terminate(Process *p){
+    if (SHOW_EVENTS)
+        printf("[Tick %d]\tSCHEDULER: TERMINATE (pid %d)\n", CPUtime, p->id);
+}
+
+extern void output_event_iofinished(int device, Process* p){
+    if (SHOW_EVENTS)
+        printf("[Tick %d]\t%s: FINISHED (pid %d)\n", CPUtime, device_names[device], p->id);
+}
 
 extern void output_info(Process* p){
     printf("[Tick %d]\t", CPUtime);
