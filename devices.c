@@ -1,6 +1,7 @@
 #include "devices.h"
 #include "queue.h"
 #include "scheduler.h"
+#include "output.h"
 
 // Struct que representa um dispositivo de E/S e suas propriedades.
 struct IODevice {
@@ -52,6 +53,7 @@ extern void simulateIO(){
         int pid = simulate_device(i);
         
         if (pid){
+            output_event_iofinished(i, process_table[pid]);
             schedule_process(process_table[pid]);
         }
     }
