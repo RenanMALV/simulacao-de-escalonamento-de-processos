@@ -45,4 +45,4 @@ void scheduler();
 unsigned scheduler_qlength(int priority);
 
 // Wrapper de queue_foreach para a fila de processos prontos para a dada prioridade.
-void scheduler_qforeach(int priority, void (*fun)(int));
+void scheduler_qforeach(int priority, void (*fun)(TYPE));
