@@ -25,7 +25,7 @@ void simulateCPU(){
     timeUsed++;
     output_info(currentProcess);
     
-    sleep(1);
+    // sleep(1);
     
     CPUtime++;
     
@@ -72,29 +72,40 @@ int main(void){
 static char instruction_chars[4] = {'D', 'T', 'P', 'C'};
 static char* priority_names[2] = {"HIGH", "LOW"};
 
-static void print_int(int pid){
+#define SHOW_EMPTY_QUEUES 1
+
+static void print_int(TYPE pid){
     printf("%d ", pid);
 }
 
-static void print_instruction(int i){
+static void print_instruction(TYPE i){
     printf("%c", instruction_chars[i]);
 }
 
 static void print_queues(){
     for (int i =0; i < NUM_PRIORITIES; i++){
-        if (scheduler_qlength(i) > 0){
+        if (SHOW_EMPTY_QUEUES || scheduler_qlength(i) > 0){
            printf("[Tick %d]\tReady Queue (%s): { ", CPUtime, priority_names[i]);
             scheduler_qforeach(i, *print_int);
             printf("}\n"); 
         }
     }
+    
+    for (int i =0; i < IO_DEVICE_NUMBER; i++){
+        if (SHOW_EMPTY_QUEUES || device_isactive(i)){
+           printf("[Tick %d]\tI/O Queue (%s): { ", CPUtime, device_names[i]);
+            device_qforeach(i, *print_int);
+            printf("}\n"); 
+        }
+    }
+    
+    
     printf("\n");
 }
 
 // -----
 
 extern void output_info(Process* p){
-    //printf("[Tick %d]\tQueues: | Ready [%d] [%d] |", Tick, scheduler_qlength(0), scheduler_qlength(1));
     printf("[Tick %d]\t", CPUtime);
 
     if (p){
