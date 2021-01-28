@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "scheduler.h"
+#include "output.h"
 
 // Prioridade atribuída a processos que foram preemptidos por consumirem toda sua fatia de tempo.
 #define PREEMPTED_PROCESS_PRIORITY 1
@@ -47,11 +48,13 @@ extern void scheduler(){
         if (queue_isempty(currentProcess->instructions)){
             currentProcess->state = PSTATE_TERMINATED;
             process_count--;
+            output_event_terminate(currentProcess);
             get_next_process();
         }
         else if (timeUsed >= MAX_TIME_USED){
             currentProcess->priority = PREEMPTED_PROCESS_PRIORITY;
             schedule_process(currentProcess);
+            output_event_preempt(currentProcess);
             get_next_process();
         }
     }
