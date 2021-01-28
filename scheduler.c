@@ -66,6 +66,6 @@ unsigned scheduler_qlength(int priority){
     return ready_queues[priority]->length;
 }
 
-void scheduler_qforeach(int priority, void (*fun)(int)){
+void scheduler_qforeach(int priority, void (*fun)(TYPE)){
     queue_foreach(ready_queues[priority], fun);
 }
