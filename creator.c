@@ -2,6 +2,7 @@
 #include "process.h"
 #include "scheduler.h"
 #include "creator.h"
+#include "output.h"
 
 #define TOTAL_PROCESSES  3  // Total de processos pré-definidos criados.
 #define INITIAL_PRIORITY 0  // Prioridade atribuída a processos recém-criados.
