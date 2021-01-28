@@ -63,3 +63,7 @@ extern void devices_init(){
         IOdevices[i].counter = IOdevices[i].duration;
     }
 }
+
+extern void device_qforeach(int deviceid, void (*fun)(TYPE)){
+    queue_foreach(IOdevices[deviceid].queue, fun);
+}
