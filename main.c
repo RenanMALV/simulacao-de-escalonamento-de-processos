@@ -14,7 +14,9 @@
 // Tempo total de execução da CPU.
 unsigned CPUtime = 0;
 
-char* device_names[3] = {"DISK", "TAPE", "PRINTER"};
+const char* device_names[3] = {"DISK", "TAPE", "PRINTER"};
+
+void get_user_input();
 
 void simulateCPU(){
     int instruction;
@@ -64,17 +66,24 @@ int main(void){
 
         // Passo 4: Simular o processamento nos dispositivos de E/S.
         simulateIO(); // (implementação: devices.c)
+        
+        if (is_interactive) get_user_input();
     }
 }
 
 //------------------------------------------------------------------------------
 // Código usado para gerar a saída do programar e mostar informações da simulação.
 
-static char instruction_chars[4] = {'D', 'T', 'P', 'C'};
-static char* priority_names[2] = {"HIGH", "LOW"};
+static const char instruction_chars[4] = {'D', 'T', 'P', 'C'};
+static const char* priority_names[2] = {"HIGH", "LOW"};
 
 #define SHOW_EMPTY_QUEUES 1
 #define SHOW_EVENTS 1
+
+void get_user_input(){
+    printf("Press enter to continue...");
+    while (getchar() != '\n'){};
+}
 
 static void print_int(TYPE pid){
     printf("%d ", pid);
