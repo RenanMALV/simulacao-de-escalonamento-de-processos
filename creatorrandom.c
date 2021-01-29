@@ -3,9 +3,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-
-//int r = rand();      // Returns a pseudo-random integer between 0 and RAND_MAX.
-
 #include "process.h"
 #include "scheduler.h"
 #include "creator.h"
@@ -20,7 +17,7 @@ static Queue* unused_ids;
 Process processes[NUM_SIMULTANEOUS+1];
 
 
-#define randrange(start,end) int randrange_i=start, randrange_end=start+rand() % end; randrange_i < randrange_end; randrange_i++
+#define randrange(start,end) int randrange_i=(start),randrange_end=(start)+rand()%(end); randrange_i <= randrange_end; randrange_i++
 
 static void randomize_process(Process* p){
     static const enum Instruction instrs[6] = {DISK, DISK, TAPE, PRINTER, CPU, CPU};
@@ -42,6 +39,8 @@ static void randomize_process(Process* p){
 }
 
 // -----
+
+bool is_interactive = true;
 
 extern int has_incoming_processes(){
     #if (MAX_CPU_TIME >= 0)
