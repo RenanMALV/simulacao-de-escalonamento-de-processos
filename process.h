@@ -21,7 +21,8 @@ typedef struct Process {
 
 // Tabela de processos (contém todos os processos vivos no sistema).
 // Mapeia um id de processo para o ponteiro daquele processo.
-extern Process* process_table[];
+//extern Process* process_table[];
+extern Process** process_table;
 
 extern unsigned process_count;
 
