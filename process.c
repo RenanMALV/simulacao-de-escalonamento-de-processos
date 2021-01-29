@@ -1,6 +1,8 @@
 #include "process.h"
 
-Process* process_table[NUM_PROCESSES] = {0};
+static Process* process_table_internal[NUM_PROCESSES] = {0};
+
+Process** process_table = process_table_internal-1;
 
 unsigned process_count = 0;
 
