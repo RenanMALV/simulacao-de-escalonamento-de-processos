@@ -8,10 +8,6 @@
 // Número de filas de prioridade. Menor prioridade = mais prioritário.
 #define NUM_PRIORITIES 2
 
-// Quantum máximo para um processo no Round Robin.
-#define MAX_TIME_USED 3
-
-
 // Global que guarda um ponteiro para o processo a ser executado pela CPU.
 extern Process* currentProcess;
 
