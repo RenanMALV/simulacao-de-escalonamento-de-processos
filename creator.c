@@ -1,91 +1,74 @@
-#include <stdio.h>
+/*
+Este arquivo contém uma implementação para a API de creator.h.
 
+Esta implementação gera um número predeterminado de processos, cujas instruções
+também são predefinidas.
+
+Esta implementação não é interativa.
+*/
+#include <stdio.h>
+#include "process.h"
 #include "scheduler.h"
+#include "creator.h"
 #include "output.h"
 
-// Prioridade atribuída a processos que foram preemptidos por consumirem toda sua fatia de tempo.
-#define PREEMPTED_PROCESS_PRIORITY 1
+#define TOTAL_PROCESSES  3  // Total de processos predefinidos criados.
 
-// Quantum máximo para um processo no Round Robin.
-#define MAX_TIME_USED 3
+// Indica número de processos já criados.
+// Usado como índice no array 'future_processes' do próximo processo a ser criado.
+static uint8_t processes_created = 0;
 
-static Queue* ready_queues[NUM_PRIORITIES];
-
-/*
- Esta função irá atribuir à global "currentProcess" o ponteiro do próximo processo
-a ser executado, de acordo com a ordem das filas de prioridade.
- Se nenhuma das filas tiver um processo a ser executado, o ponteiro currentProcess é null;
-*/
-static void get_next_process(){
-    for (int i = 0; i < NUM_PRIORITIES; i++) {
-        if (!queue_isempty(ready_queues[i])) {
-            currentProcess = process_table[queue_pop(ready_queues[i])];
-            currentProcess->state = PSTATE_RUNNING;
-            timeUsed = 0;
-            return;
-        }
-    }
-    if (currentProcess) {
-        timeUsed = 0;
-        currentProcess = NULL;
-    }
-}
-
-static void terminate_process(Process* p){
-    currentProcess->state = PSTATE_TERMINATED;
-    process_count--;
-    output_event_terminate(currentProcess);
-}
+// Array que contém os processos predefinidos que serão criados.
+// Nesta declaração podemos indicar o tempo de início de cada processo.
+// Para indicar as instruções dos processos, usar initialize_processes.
+static Process future_processes[TOTAL_PROCESSES] = {
+    {.start=0},
+    {.start=5},
+    {.start=5}
+};
 
 // -----
 
-Process* currentProcess = NULL;
-uint8_t timeUsed = 0;
+bool is_interactive = false;
 
-extern void schedule_process(Process* p){
-    if (p->instructions->length){
-        p->state = PSTATE_READY;
-        queue_push(ready_queues[p->priority], p->id);
-    }
-    else{
-        // Processos sem instrução não podem chegar na CPU.
-        // Necessário para suportar processos que terminam com instrução de E/S.
-        terminate_process(p);  
-    }
+extern int has_incoming_processes(){
+    return processes_created < TOTAL_PROCESSES;
 }
 
-extern void scheduler_block(){
-    currentProcess->state = PSTATE_BLOCKED;
-    get_next_process();
-}
-
-extern void scheduler(){
-    if (!currentProcess){
-        get_next_process();
-    }
-    else {
-        if (!currentProcess->instructions->length){
-            terminate_process(currentProcess);
-            get_next_process();
+extern void create_processes(){    
+    while (processes_created < TOTAL_PROCESSES){
+        Process* p = &future_processes[processes_created];
+        if (CPUtime == p->start){
+            processes_created++;
+            unsigned pid_gen = processes_created;
+            
+            // Inicializar processo
+            p->id = pid_gen;
+            p->state = PSTATE_CREATED;
+            p->priority = INITIAL_PRIORITY;
+            process_table[p->id] = p;
+            output_info(p);
+            process_count++;
+            
+            schedule_process(p);
         }
-        else if (timeUsed >= MAX_TIME_USED){
-            currentProcess->priority = PREEMPTED_PROCESS_PRIORITY;
-            schedule_process(currentProcess);
-            output_event_preempt(currentProcess);
-            get_next_process();
-        }
+        else{
+            return;
+        }   
     }
 }
 
-extern void scheduler_init(){
-    for (int i = 0; i < NUM_PRIORITIES; i++)
-        ready_queues[i] = queue_create(NUM_PROCESSES);
-}
-
-unsigned scheduler_qlength(int priority){
-    return ready_queues[priority]->length;
-}
-
-void scheduler_qforeach(int priority, void (*fun)(TYPE)){
-    queue_foreach(ready_queues[priority], fun);
+extern void initialize_processes(){
+    future_processes[0].instructions = queue_create(20);
+    process_add_instructions(&future_processes[0], CPU, 3);
+    process_add_instructions(&future_processes[0], DISK, 1);
+    process_add_instructions(&future_processes[0], CPU, 10);
+    
+    future_processes[1].instructions = queue_create(20);
+    process_add_instructions(&future_processes[1], CPU, 5);
+    
+    future_processes[2].instructions = queue_create(20);
+    process_add_instructions(&future_processes[2], CPU, 1);
+    process_add_instructions(&future_processes[2], TAPE, 1);
+    process_add_instructions(&future_processes[2], CPU, 4);  
 }
