@@ -1,6 +1,6 @@
 #pragma once
 
-#include "process.h"
+#include "queue.h"
 
 // Inicializa os dispositivos de E/S. Deve ser chamada antes do laço principal do simulador.
 void devices_init();
